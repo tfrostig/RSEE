@@ -249,7 +249,7 @@ LOWESS <- function(x, fps = 25, h = 10, d = 2,  r = 2, smooth.para = 6) {
 
   local.test.mat <- NULL
   for (i in 0:d) {
-    local.test.mat <- cbind(local.test.mat, (time.vec / fps) ** i)
+    local.test.mat <- cbind(local.test.mat, (time.vec) ** i)
   }
   ### Creating local regression X vector
   ### Padding with zeros for start
