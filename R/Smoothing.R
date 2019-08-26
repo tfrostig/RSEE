@@ -249,7 +249,7 @@ LOWESS <- function(x, fps = 25, h = 10, d = 2,  r = 2, smooth.para = 6) {
 
   local.test.mat <- NULL
   for (i in 0:d) {
-    local.test.mat <- cbind(local.test.mat, time.vec ** i)
+    local.test.mat <- cbind(local.test.mat, (time.vec / fps) ** i)
   }
   ### Creating local regression X vector
   ### Padding with zeros for start
@@ -296,8 +296,8 @@ RRM <- function(x,y,l=5,eps=1e-6,h.seq=c(7,5,3,3)) {
   x.hat <- x
   y.hat <- y
   for (h in h.seq) {
-    x.hat <- runmed(x.hat,h)
-    y.hat <- runmed(y.hat,h)
+    x.hat <- runmed(x.hat, 2 * h + 1, endrule = 'constant')
+    y.hat <- runmed(y.hat, 2 * h + 1, endrule = 'constant')
   }
   x <- x.hat
   y <- y.hat
