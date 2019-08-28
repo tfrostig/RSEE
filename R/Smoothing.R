@@ -93,13 +93,13 @@ RSEE.smooth <- function(object=NULL,path=NULL,project = "",individual = "",
   for (j in 1:length(ent.start)) {
     ind <- ent.start[j]:ent.stop[j]
     temp.x <- LOWESS(A$x[ind],fps,h.loess,d.loess,r.loess)
-    x[ind] <- temp.x$x
-    v.x[ind] <- temp.x$v
-    a.x[ind] <- temp.x$a
+    x[ind] <- temp.x[ ,'loc']
+    v.x[ind] <- temp.x[ ,'v']
+    a.x[ind] <- temp.x[ ,'a']
     temp.y <- LOWESS(A$y[ind],fps,h.loess,d.loess,r.loess)
-    y[ind] <- temp.y$x
-    v.y[ind] <- temp.y$v
-    a.y[ind] <- temp.y$a
+    y[ind] <- temp.y[ ,'loc']
+    v.y[ind] <- temp.y[ ,'v']
+    a.y[ind] <- temp.y[ ,'a']
     rm(temp.x,temp.y,ind)
     if (n.ent>1) setTxtProgressBar(pb, j)
   }
@@ -273,7 +273,7 @@ LOWESS <- function(x, fps = 25, h = 10, d = 2,  r = 2, smooth.para = 6) {
       mov.mat <- lastIterLowess(weightX = w, weightY = delta, modelmat = local.test.mat, x = padx, h = h)
     }
   }
-  colnames(mov.mat)[1:(d + 1)] <- c('loc', 'v', 'a', rep(NA, 3 - (d + 1)))[1:(d + 1)]
+  colnames(mov.mat)[1:(d + 1)] <- c('loc', 'v', 'a', rep(NA, max(d - 2, 0)))[1:(d + 1)]
   if (d > 1) {
     mov.mat[ ,3] <- mov.mat[ ,3] * 2 ## Accelration
   }
