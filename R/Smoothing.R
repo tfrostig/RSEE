@@ -15,8 +15,7 @@
 #' @param frames.rrm RRM arguments (see NOTE)
 #' @param cutoff.rrm RRM arguments (see NOTE)
 #' @param h.rrm sequence of half-window widths for repeated RM
-#' @note  an arrest is a sequence of at least "frames.rrm" frames in which the maximum distance
-#         betwee the two farthest points (after RRM) is no more than "cutoff.rrm" cm
+#' @note  an arrest is a sequence of at least "frames.rrm" frames in which the maximum distance between the two farthest points (after RRM) is no more than "cutoff.rrm"
 
 # VALUES:
 #' @return  The function returns a list with following objects:

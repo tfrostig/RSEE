@@ -56,5 +56,5 @@ The function returns a list with following objects:
 RSEE.smooth - performs LOWESS and RRM
 }
 \note{
-an arrest is a sequence of at least "frames.rrm" frames in which the maximum distance
+an arrest is a sequence of at least "frames.rrm" frames in which the maximum distance between the two farthest points (after RRM) is no more than "cutoff.rrm"
 }
