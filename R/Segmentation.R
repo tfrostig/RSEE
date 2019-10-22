@@ -1,5 +1,5 @@
-#' RSEE.segment - performs segmentation to lingering and progression
-#' @param object list of results from RSEE.smooth
+#' RSEEsegment - performs segmentation to lingering and progression
+#' @param object list of results from RSEEsmooth
 #' @param initial.n.gauss number of initial Gaussians to fit (recommended 2)
 #' @param which.intersect if zero, returns the intersection between the leftmost and the rightmost Gaussians.
 #'   In case of two Gaussians, just the intersection between them)
@@ -15,7 +15,7 @@
 #' \item{info}{updated to include velocity.threshold.cm.s - the velocity threshold between lingering and
 #'     progression (cm/s, non transformed)}}
 #' @export
-RSEE.segment <- function(object,initial.n.gauss=2,which.intersect=0,
+RSEEsegment <- function(object,initial.n.gauss=2,which.intersect=0,
                          min.length.motion.seg=2,user.permission=F) {
   options(warn=-1)
   library(utils)
@@ -25,8 +25,8 @@ RSEE.segment <- function(object,initial.n.gauss=2,which.intersect=0,
 
   ind.segs <- which(motion$length>=min.length.motion.seg)
   v <- motion$max.v[ind.segs]
-  em <- EM.gaussian.algorithm(log(v+2),num.gauss=initial.n.gauss)
-  x.intersect <- calc.intersection(log(v+2),obj=em,which.intersect=which.intersect,
+  em <- EMgaussian(log(v+2),num.gauss=initial.n.gauss)
+  x.intersect <- calcIntersection(log(v+2),obj=em,which.intersect=which.intersect,
                                    save.plot=NULL,x.lab="Maximum segment velocity (log cm/s +2)")
 
   if (user.permission) {
@@ -45,20 +45,20 @@ RSEE.segment <- function(object,initial.n.gauss=2,which.intersect=0,
         if (a=="1") x.intersect <- locator(1,pch=3,col="dark green",lwd=3,type="p")$x
         if (a=="2") {
           n.gauss <- n.gauss+1
-          em <- EM.gaussian.algorithm(log(v+2),num.gauss=n.gauss)
-          x.intersect <- calc.intersection(log(v+2),obj=em,which.intersect=which.intersect,
+          em <- EMgaussian(log(v+2),num.gauss=n.gauss)
+          x.intersect <- calcIntersection(log(v+2),obj=em,which.intersect=which.intersect,
                                            save.plot=NULL,x.lab="Maximum segment velocity (log cm/s +2)")
         }
         if (a=="3") {
           n.gauss <- n.gauss-1
-          em <- EM.gaussian.algorithm(log(v+2),num.gauss=n.gauss)
-          x.intersect <- calc.intersection(log(v+2),obj=em,which.intersect=which.intersect,
+          em <- EMgaussian(log(v+2),num.gauss=n.gauss)
+          x.intersect <- calcIntersection(log(v+2),obj=em,which.intersect=which.intersect,
                                            save.plot=NULL,x.lab="Maximum segment velocity (log cm/s +2)")
         }
         if (a=="4") {
           n.gauss <- 2
-          em <- EM.gaussian.algorithm(log(v+2),num.gauss=n.gauss)
-          x.intersect <- calc.intersection(log(v+2),obj=em,which.intersect=which.intersect,
+          em <- EMgaussian(log(v+2),num.gauss=n.gauss)
+          x.intersect <- calcIntersection(log(v+2),obj=em,which.intersect=which.intersect,
                                            save.plot=NULL,x.lab="Maximum segment velocity (log cm/s +2)")
         }
       }
@@ -113,7 +113,7 @@ RSEE.segment <- function(object,initial.n.gauss=2,which.intersect=0,
 
 
 # fits num.gauss gaussians to a vector y
-EM.gaussian.algorithm <- function(y,num.gauss=2,mu=NULL,sigma=NULL,p=NULL,max.iter=200,err=0.001) {
+EMgaussian <- function(y,num.gauss=2,mu=NULL,sigma=NULL,p=NULL,max.iter=200,err=0.001) {
   count <- 0
   flag <- T
   n <- length(y)
@@ -121,7 +121,7 @@ EM.gaussian.algorithm <- function(y,num.gauss=2,mu=NULL,sigma=NULL,p=NULL,max.it
   if (is.null(mu)) mu <- matrix(min(y)+diff(range(y))*seq(0,1,length=num.gauss+2)[-c(1,num.gauss+2)],1,num.gauss)
   if (is.null(sigma)) sigma <- matrix(rep(sd(y)/sqrt(num.gauss),num.gauss),1,num.gauss)
 
-  llk <- log.lik(y,p[1,],mu[1,],sigma[1,])
+  llk <- logLik(y,p[1,],mu[1,],sigma[1,])
   while (flag) {
     count <- count+1
     # E step
@@ -152,7 +152,7 @@ EM.gaussian.algorithm <- function(y,num.gauss=2,mu=NULL,sigma=NULL,p=NULL,max.it
     #if (temp>m) m <- temp
     #temp <- sqrt(sum(((p[count+1,]-p[count,]))^2))
     #if (temp>m) m <- temp
-    llk <- c(llk,log.lik(y,p[count+1,],mu[count+1,],sigma[count+1,]))
+    llk <- c(llk,logLik(y,p[count+1,],mu[count+1,],sigma[count+1,]))
     m <- abs(llk[count+1]-llk[count])
 
 
@@ -168,7 +168,7 @@ EM.gaussian.algorithm <- function(y,num.gauss=2,mu=NULL,sigma=NULL,p=NULL,max.it
 }
 
 
-log.lik <- function(y,p,mu,sigma) {
+logLik <- function(y,p,mu,sigma) {
   v <- rep(0,length(y))
   for (i in 1:length(p)) {
     v <- v+p[i]*dnorm(y,mu[i],sigma[i])
@@ -186,7 +186,7 @@ log.lik <- function(y,p,mu,sigma) {
 #                 (0 - intersection between the leftmost and the rightmost Gaussians)
 # save.plot - path in which to save the density plot. If NULL => no save
 
-calc.intersection <- function (y,obj=NULL,x.step=0.01,mu,sigma,p,draw.point=T,which.intersect=1,x.lab="log(v.max+2)",
+calcIntersection <- function (y,obj=NULL,x.step=0.01,mu,sigma,p,draw.point=T,which.intersect=1,x.lab="log(v.max+2)",
                                save.plot=NULL,do.plot=T) {
   if (!is.null(obj)) {
     mu <- obj$mu

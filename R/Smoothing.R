@@ -1,4 +1,4 @@
-#' RSEE.smooth - performs LOWESS and RRM
+#' RSEEsmooth - performs LOWESS and RRM
 #' @param object data frame with x and y coordinates.
 #'  name of x coordinates vector should contain "x" or "X"
 #'   column name of y coordinates vector should contain "y" or "Y"
@@ -34,7 +34,7 @@
 #'  }
 #' @export
 
-RSEE.smooth <- function(object=NULL,path=NULL,project = "",individual = "",
+RSEEsmooth <- function(object=NULL,path=NULL,project = "",individual = "",
                         forced=T,fps=25,h.loess=10,d.loess=2,r.loess=2,
                         frames.rrm=5,cutoff.rrm=1e-6,h.rrm=c(7,5,3,3)) {
   options(warn=-1)
@@ -205,7 +205,7 @@ RSEE.smooth <- function(object=NULL,path=NULL,project = "",individual = "",
   info <- list(project = project, individual = individual,
                length.of.session.minutes = n/(fps*60),home = home,number.of.entries = n.ent)
 
-  rm(A,dat,x,y,v.x,v.y,a.x,a.y,v,
+  rm(A,x,y,v.x,v.y,a.x,a.y,v,
      ent.start,ent.stop,ind.entry,
      arr.stop,arr.start,arr.entry,
      motion.start,motion.stop,motion.entry,max.v,
@@ -239,7 +239,7 @@ LOWESS <- function(x, fps = 25, h = 10, d = 2,  r = 2, smooth.para = 6) {
   n        <- length(x)
   if (h > n) {
     h <- n
-    print('Window size cannot be smaller than number of observation, coercing h = n')
+    warning('Window size cannot be smaller than number of observation, coercing h = n')
   }
   time.vec  <- seq(-h , h , 1) / fps ### For weighting and derivatives
   ### Creating weight

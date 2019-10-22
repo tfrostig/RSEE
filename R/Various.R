@@ -9,7 +9,10 @@ NULL
 NULL
 
 
-devtools::use_package("tidyverse")
-devtools::use_package("smoothie")
-devtools::use_package("scales")
+usethis::use_package("dplyr")
+usethis::use_package("ggplot2")
+usethis::use_package("smoothie")
+usethis::use_package("scales")
+usethis::use_package("reshape2")
+usethis::use_package("RcppArmadillo")
 

@@ -13,7 +13,7 @@ createMap <- function(smooth.data,
     y.vec <- seq(min(coord.long$y), max(coord.long$y), 1)
   }
   full.mat <- expand.grid('x' = x.vec, 'y' = y.vec)
-  full.mat <- dplyr::left_join(full.mat, coord.long) %>% dplyr::mutate(count = replace_na(count, 0))
+  full.mat <- dplyr::left_join(full.mat, coord.long) %>% dplyr::mutate(count = replace(count, which(is.na(count)), 0))
   return(xtabs(count ~ x + y, data = full.mat))
 }
 
@@ -28,6 +28,8 @@ smoothMap <- function(wide.coord.mat,
   return(wide.heat.smooth)
 }
 
+
+### Find maxima
 FindMax <- function(wide.heat.smooth, quant) {
   y.dim <- ncol(wide.heat.smooth)
   x.dim <- nrow(wide.heat.smooth)
@@ -43,13 +45,12 @@ FindMax <- function(wide.heat.smooth, quant) {
   max.point <- which(wide.heat.smooth >= M1 & wide.heat.smooth > M2 & wide.heat.smooth > M3 &
                        wide.heat.smooth > M4 & wide.heat.smooth > M5 & wide.heat.smooth > M6 &
                        wide.heat.smooth > M7 & wide.heat.smooth > M8, arr.ind = TRUE)
-  max.point[,1] <- x.dim - max.point[,1]
-  colnames(max.point) <- c('y', 'x')
-  max.point <- max.point[,2:1]
-  return(max.point)
+  y.coord.max <- as.numeric(colnames(wide.heat.smooth)[max.point[ ,2]])
+  x.coord.max <- as.numeric(rownames(wide.heat.smooth)[max.point[ ,1]])
+  return(cbind('x' = x.coord.max, 'y' = y.coord.max))
 }
 
-#' HeatMaker - Calculates smoothed dwell time at each coodinates
+#' HeatMaker - Calculates smoothed dwell time at each coodinates.
 #' @param smooth.data A data.frame contains x and y coordinates
 #'  name of x coordinates vector should contain "x" or "X"
 #'   column name of y coordinates vector should contain "y" or "Y"
@@ -78,7 +79,7 @@ SmoothDwell <- function(smooth.data,
   smooth.data.dwell.time <- reshape2::melt(smooth.heat.map)
   colnames(smooth.data.dwell.time) <- c('x', 'y', 'smooth.dwell.time')
   if (to.plot) {
-    DrawHeat(smooth.data.dwell.time)
+    print(DrawHeat(smooth.data.dwell.time))
   }
   return(list('smooth.dwell.time' = smooth.data.dwell.time,
               'local.maxima'      = max.points))
@@ -91,15 +92,15 @@ col.pal <- c(scales::seq_gradient_pal('white', 'red')(seq(0, 1, length.out = 20)
 
 ### Create heatmap
 DrawHeat <- function(smooth.dwell.df) {
-  ggplot::ggplot() +
-    ggplot::geom_tile(data =  smooth.dwell.df, aes(x = x, y = y, fill = smooth.dwell.time)) +
-    ggplot::geom_contour(data =  smooth.dwell.df, aes(x = x, y = y, z = smooth.dwell.time),
+  ggplot2::ggplot() +
+    ggplot2::geom_tile(data =  smooth.dwell.df, ggplot2::aes(x = x, y = y, fill = smooth.dwell.time)) +
+    ggplot2::geom_contour(data =  smooth.dwell.df, ggplot2::aes(x = x, y = y, z = smooth.dwell.time),
                  color = "darkgrey", alpha = 1, bins = 10) +
-    ggplot::scale_fill_gradientn(colors = col.pal, values = seq(0, 37, length.out = 50) / 37)  +
-    ggplot::theme_bw() +
-    ggplot::theme(legend.position = 'none') +
-    ggplot::xlab('') +
-    ggplot::ylab('') +
-    ggplot::coord_fixed(ratio = 1)
+    ggplot2::scale_fill_gradientn(colors = col.pal, values = seq(0, 37, length.out = 50) / 37)  +
+    ggplot2::theme_bw() +
+    ggplot2::theme(legend.position = 'none') +
+    ggplot2::xlab('') +
+    ggplot2::ylab('') +
+    ggplot2::coord_fixed(ratio = 1)
 }
 

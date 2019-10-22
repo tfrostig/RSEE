@@ -16,4 +16,11 @@ LinkingTo:
     RcppArmadillo
 Imports: 
     Rcpp,
-    RcppArmadillo
+    RcppArmadillo,
+    dplyr,
+    ggplot2,
+    smoothie,
+    scales,
+    reshape2
+Suggests: 
+    testthat (>= 2.1.0)
