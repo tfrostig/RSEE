@@ -7,3 +7,9 @@ NULL
 #' @importFrom Rcpp sourceCpp
 ## usethis namespace: end
 NULL
+
+
+devtools::use_package("tidyverse")
+devtools::use_package("smoothie")
+devtools::use_package("scales")
+
