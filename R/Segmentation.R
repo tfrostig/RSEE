@@ -156,7 +156,8 @@ EMgaussian <- function(y,num.gauss=2,mu=NULL,sigma=NULL,p=NULL,max.iter=200,err=
     m <- abs(llk[count+1]-llk[count])
 
 
-    if (m<=err) { flag <- F
+    if (m<=err) {
+      flag <- F
     } else {
       if (count>=max.iter) {
         cat("Maximum iteration reached\n")
